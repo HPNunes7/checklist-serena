@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#FF5246"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Checklist Veicular"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png"/>
+<title>Checklist Veicular - Serena</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --serena:#FF5246;--serena-dark:#cc3b30;--serena-light:#fff0ef;
+    --text:#1a1a1a;--text-muted:#666;--border:#e0e0e0;--bg:#f5f5f5;--white:#ffffff;
+    --green-bg:#eaf3de;--green-text:#3b6d11;--green-border:#97c459;
+    --gray-bg:#f1efe8;--gray-text:#5f5e5a;--gray-border:#b4b2a9;
+    --amber-bg:#fff3e0;--amber-text:#7a4000;
+    --blue-bg:#e8f0fe;--blue-text:#1a56db;
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .app{max-width:480px;margin:0 auto;padding-bottom:3rem}
+  .header{background:var(--serena);padding:1rem 1.25rem 0.75rem;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px;margin-bottom:0.35rem}
+  .hsub{font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:0.6rem}
+  .pbar{height:3px;background:rgba(255,255,255,0.3);border-radius:2px}
+  .pfill{height:100%;background:#fff;border-radius:2px;transition:width 0.35s ease}
+  .nav{display:flex;background:var(--white);border-bottom:1px solid var(--border)}
+  .nb{flex:1;padding:11px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:color 0.15s}
+  .nb.on{color:var(--serena);border-bottom-color:var(--serena)}
+  .sec{padding:1rem 1.25rem 0}
+  .slbl{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px}
+  .card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1rem}
+  select,input[type=text]{width:100%;padding:11px 13px;font-size:15px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);font-family:inherit;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+  input[type=text]{background-image:none}
+  select:focus,input[type=text]:focus{outline:none;border-color:var(--serena);box-shadow:0 0 0 3px rgba(255,82,70,0.1)}
+  .ci{padding:11px 0;border-bottom:1px solid var(--border)}
+  .ci:last-child{border-bottom:none;padding-bottom:0}
+  .irow{display:flex;align-items:flex-start;gap:6px;margin-bottom:7px}
+  .iname{font-size:14px;color:var(--text);flex:1;line-height:1.4;padding-top:1px}
+  .bimp{font-size:10px;font-weight:600;padding:2px 7px;background:var(--serena-light);color:var(--serena-dark);border-radius:20px;border:1px solid rgba(255,82,70,0.2);white-space:nowrap;flex-shrink:0;margin-top:2px}
+  .rg{display:flex;gap:5px}
+  .rb{flex:1;padding:8px 4px;font-size:11.5px;font-weight:500;text-align:center;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text-muted);cursor:pointer;transition:all 0.12s;user-select:none;-webkit-user-select:none}
+  .rb.c.on{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)}
+  .rb.n.on{background:var(--serena-light);color:var(--serena-dark);border-color:var(--serena)}
+  .rb.a.on{background:var(--gray-bg);color:var(--gray-text);border-color:var(--gray-border)}
+  .rb:active{transform:scale(0.97)}
+  textarea.tobs{width:100%;padding:9px 11px;font-size:13px;resize:none;height:62px;border:1px solid var(--serena);border-radius:8px;background:var(--serena-light);color:var(--text);font-family:inherit;margin-top:6px;}
+  textarea.tobs:focus{outline:none;box-shadow:0 0 0 3px rgba(255,82,70,0.1)}
+  textarea.tgeral{width:100%;padding:9px 11px;font-size:13px;resize:none;height:80px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);font-family:inherit;}
+  textarea.tgeral:focus{outline:none;border-color:var(--serena);box-shadow:0 0 0 3px rgba(255,82,70,0.1)}
+  .aimp{background:var(--serena-light);border:1px solid rgba(255,82,70,0.25);border-radius:8px;padding:8px 11px;font-size:12px;color:var(--serena-dark);margin-top:6px;display:none;line-height:1.4;}
+  .disc-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1rem}
+  .disc-box label{display:flex;gap:11px;align-items:flex-start;cursor:pointer}
+  .disc-box input[type=checkbox]{margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--serena)}
+  .disc-box span{font-size:13px;color:var(--text-muted);line-height:1.55}
+  .bsub{width:100%;padding:15px;font-size:15px;font-weight:600;background:var(--serena);color:#fff;border:none;border-radius:12px;cursor:pointer;transition:opacity 0.15s,transform 0.1s;letter-spacing:0.1px;}
+  .bsub:disabled{opacity:0.32;cursor:not-allowed}
+  .bsub:not(:disabled):hover{opacity:0.9}
+  .bsub:not(:disabled):active{transform:scale(0.98)}
+  .bexp{width:100%;padding:11px;font-size:13px;font-weight:500;background:var(--white);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:1rem;transition:background 0.12s;}
+  .bexp:hover{background:var(--bg)}
+  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;transition:transform 0.3s ease;max-width:320px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.ok{background:#3b6d11}
+  .toast.err{background:#cc3b30}
+  .toast.loading{background:#1a56db}
+  .sync-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;}
+  .sync-ok{background:var(--green-bg);color:var(--green-text)}
+  .sync-local{background:var(--amber-bg);color:var(--amber-text)}
+  .sync-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .rc{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:10px}
+  .rh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+  .rv{font-size:14px;font-weight:600;color:var(--text)}
+  .rd{font-size:11px;color:var(--text-muted);margin-top:1px}
+  .rw{font-size:12px;color:var(--text-muted);margin-bottom:8px}
+  .pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px}
+  .pl{font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px}
+  .plc{background:var(--green-bg);color:var(--green-text)}
+  .pln{background:var(--serena-light);color:var(--serena-dark)}
+  .pla{background:var(--gray-bg);color:var(--gray-text)}
+  .pli{background:var(--amber-bg);color:var(--amber-text)}
+  .robs{font-size:12px;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5}
+  .empty{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-size:14px}
+  .cfg-card{background:var(--blue-bg);border:1px solid #c3d4f7;border-radius:12px;padding:1rem;margin-bottom:1rem}
+  .cfg-title{font-size:12px;font-weight:600;color:var(--blue-text);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .cfg-card input[type=text]{background:var(--white);font-size:13px;padding:9px 12px}
+  .cfg-hint{font-size:11px;color:#4a6fa5;margin-top:5px;line-height:1.5}
+  .spacer{height:1.5rem}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133 32" height="28" style="flex-shrink:0">
+        <polygon fill="#fff" points="2.02,12.4 24.49,6.38 24.49,4.68 2.02,10.7"></polygon>
+        <rect fill="#fff" x="2.02" y="13.14" width="22.47" height="2.98"></rect>
+        <polygon fill="#fff" points="2.02,27.14 24.49,21.12 24.49,16.86 2.02,22.88"></polygon>
+        <path fill="#fff" d="M44.86,15.16c-0.91-0.38-2.12-0.74-3.64-1.1c-0.09-0.02-0.19-0.04-0.3-0.07l-0.13-0.03c-0.98-0.22-1.71-0.43-2.19-0.62c-0.48-0.19-0.84-0.42-1.08-0.68c-0.25-0.27-0.37-0.61-0.37-1.03c0-0.67,0.27-1.13,0.8-1.4c0.53-0.27,1.3-0.4,2.3-0.4c1.22,0,2.13,0.19,2.72,0.57c0.59,0.38,0.9,0.96,0.92,1.74h3.34c-0.02-1.53-0.6-2.74-1.72-3.6c-1.12-0.87-2.84-1.3-5.16-1.3c-2.16,0-3.82,0.38-4.97,1.15c-1.16,0.77-1.74,1.91-1.74,3.42c0,1.02,0.23,1.84,0.68,2.45c0.46,0.61,1.12,1.11,1.99,1.5c0.87,0.39,2.05,0.77,3.54,1.15l0.6,0.13c0.98,0.25,1.72,0.46,2.24,0.63c0.51,0.18,0.91,0.43,1.2,0.75c0.29,0.32,0.43,0.74,0.43,1.25c0,0.8-0.3,1.38-0.88,1.73c-0.59,0.36-1.5,0.53-2.72,0.53c-1.4,0-2.46-0.24-3.19-0.72c-0.72-0.48-1.11-1.25-1.15-2.32h-3.47c0.02,1.82,0.67,3.23,1.94,4.22c1.27,0.99,3.16,1.48,5.67,1.48c1.65,0,3.01-0.23,4.1-0.68c1.09-0.46,1.91-1.07,2.45-1.85c0.54-0.78,0.82-1.68,0.82-2.7c0-1.07-0.28-1.94-0.83-2.62C46.51,16.06,45.77,15.54,44.86,15.16z"></path>
+        <path fill="#fff" d="M62.81,8.23c-1.27-0.68-2.8-1.02-4.6-1.02c-1.8,0-3.35,0.36-4.65,1.08c-1.3,0.72-2.3,1.74-2.99,3.05c-0.69,1.31-1.03,2.85-1.03,4.6c0,1.69,0.34,3.19,1.03,4.5c0.69,1.31,1.7,2.33,3.02,3.05c1.32,0.72,2.9,1.08,4.72,1.08c2.2,0,4.03-0.47,5.47-1.42c1.45-0.95,2.39-2.3,2.84-4.05h-3.57c-0.25,0.78-0.77,1.42-1.58,1.92c-0.81,0.5-1.84,0.75-3.09,0.75c-1.09,0-2.02-0.24-2.8-0.73c-0.78-0.49-1.37-1.18-1.79-2.07c-0.31-0.68-0.51-1.45-0.58-2.34h13.51c0.02-0.13,0.04-0.27,0.05-0.4c0.01-0.13,0.02-0.26,0.02-0.37v-0.4c-0.02-1.67-0.37-3.12-1.05-4.37C65.05,9.88,64.08,8.91,62.81,8.23z M53.67,12.81c0.33-0.88,0.88-1.58,1.63-2.12c0.76-0.53,1.7-0.8,2.84-0.8c1.11,0,2.04,0.22,2.77,0.67c0.73,0.45,1.27,1.1,1.62,1.97c0.2,0.49,0.32,1.05,0.37,1.67h-9.6C53.38,13.7,53.5,13.24,53.67,12.81z"></path>
+        <path fill="#fff" d="M74.27,8.05c-0.79,0.49-1.41,1.22-1.85,2.2l-0.6-2.77h-3.27l0.5,3.97v12.88h3.54V13.09c0.85-1.35,2.28-2.07,4.83-2.07h0.88v-3.7h-0.9C76.1,7.32,75.06,7.56,74.27,8.05z"></path>
+        <path fill="#fff" d="M91.67,8.23c-1.27-0.68-2.8-1.02-4.6-1.02c-1.8,0-3.35,0.36-4.65,1.08c-1.3,0.72-2.3,1.74-2.99,3.05c-0.69,1.31-1.03,2.85-1.03,4.6c0,1.69,0.34,3.19,1.03,4.5c0.69,1.31,1.7,2.33,3.02,3.05c1.32,0.72,2.9,1.08,4.72,1.08c2.2,0,4.03-0.47,5.47-1.42c1.45-0.95,2.39-2.3,2.84-4.05h-3.57c-0.25,0.78-0.77,1.42-1.58,1.92c-0.81,0.5-1.84,0.75-3.09,0.75c-1.09,0-2.02-0.24-2.8-0.73c-0.78-0.49-1.37-1.18-1.79-2.07c-0.31-0.68-0.51-1.45-0.58-2.34h13.51c0.02-0.13,0.04-0.27,0.05-0.4c0.01-0.13,0.02-0.26,0.02-0.37v-0.4c-0.02-1.67-0.37-3.12-1.05-4.37C93.91,9.88,92.94,8.91,91.67,8.23z M82.53,12.81c0.33-0.88,0.88-1.58,1.63-2.12c0.76-0.53,1.7-0.8,2.84-0.8c1.11,0,2.04,0.22,2.77,0.67c0.73,0.45,1.27,1.1,1.62,1.97c0.2,0.49,0.32,1.05,0.37,1.67h-9.6C82.24,13.7,82.37,13.24,82.53,12.81z"></path>
+        <path fill="#fff" d="M106.62,7.22c-1.4,0-2.61,0.31-3.62,0.92c-0.74,0.45-1.33,1.06-1.79,1.83l-0.52-2.48h-3.27l0.5,3.6v13.25h3.54V12.97c0.35-0.78,0.81-1.4,1.38-1.85c1.25-0.99,2.6-0.93,2.79-0.93c1.33,0,2.33,0.42,2.99,1.27c0.66,0.85,0.98,2.12,0.98,3.84v9.04h3.54v-9.38c0-2.56-0.51-4.49-1.53-5.79C110.57,7.87,108.91,7.22,106.62,7.22z"></path>
+        <path fill="#fff" d="M130.98,24.33l-0.47-3.64v-7.34c0-2.18-0.59-3.74-1.77-4.69c-1.18-0.95-2.97-1.42-5.37-1.42c-2.36,0-4.12,0.44-5.29,1.32c-1.17,0.88-1.79,2.17-1.85,3.89h3.4c0-0.96,0.32-1.64,0.97-2.05c0.64-0.41,1.57-0.62,2.77-0.62c1.13,0,2.01,0.24,2.64,0.72c0.62,0.48,0.93,1.34,0.93,2.59v1.5h-4.34c-2.45,0-4.27,0.45-5.47,1.35c-1.2,0.9-1.8,2.16-1.8,3.79c0,0.98,0.23,1.84,0.68,2.57c0.46,0.73,1.13,1.3,2.04,1.7c0.9,0.4,2,0.6,3.29,0.6c1.71,0,3.09-0.34,4.14-1.02c0.71-0.46,1.29-1.08,1.73-1.84l0.5,2.59H130.98z M125.74,20.75c-0.8,0.92-1.99,1.38-3.57,1.38c-1.07,0-1.89-0.22-2.45-0.65c-0.57-0.43-0.85-1.13-0.85-2.09c0-0.6,0.13-1.09,0.4-1.47c0.27-0.38,0.68-0.65,1.25-0.82c0.57-0.17,1.3-0.26,2.19-0.28h0.63h3.6v0.3C126.94,18.62,126.54,19.82,125.74,20.75z"></path>
+      </svg>
+      <span style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:400;letter-spacing:0.1px">Cluster Chui</span>
+    </div>
+    <div class="hsub" id="hsub">Checklist veicular - vistoria semanal</div>
+    <div class="pbar"><div class="pfill" id="prog" style="width:0%"></div></div>
+  </div>
+
+  <div class="nav">
+    <button class="nb on" id="nb-f" onclick="goView('f')">Novo checklist</button>
+    <button class="nb" id="nb-h" onclick="goView('h')">Historico</button>
+    <button class="nb" id="nb-c" onclick="goView('c')">Configurar</button>
+  </div>
+
+  <!-- FORM -->
+  <div id="vf">
+    <div class="sec"><div class="slbl">Veiculo</div>
+      <div class="card">
+        <select id="sel" onchange="onVei()">
+          <option value="">Selecione o veiculo...</option>
+          <option value="Montana|TXP0F12|Fabio">Montana - TXP0F12 - Fabio</option>
+          <option value="L200|TES2D34|Gabriel">L200 - TES2D34 - Gabriel</option>
+          <option value="Renegade|TER5B06|Leonardo">Renegade - TER5B06 - Leonardo</option>
+          <option value="Renegade|TEU9D94|Leandro">Renegade - TEU9D94 - Leandro</option>
+          <option value="Renegade|TER5B07|Athos">Renegade - TER5B07 - Athos</option>
+          <option value="Commander|TEH1H04|Fernando">Commander - TEH1H04 - Fernando</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec"><div class="slbl">Condutor</div>
+      <div class="card">
+        <input type="text" id="cond" placeholder="Nome do condutor" oninput="upd()"/>
+      </div>
+    </div>
+    <div class="sec" id="si" style="display:none"><div class="slbl">Itens de verificacao</div>
+      <div class="card" id="ilist"></div>
+    </div>
+    <div class="sec" id="so" style="display:none"><div class="slbl">Observacoes gerais</div>
+      <div class="card">
+        <textarea class="tgeral" id="og" placeholder="Registre ocorrencias, nao conformidades ou outras observacoes..."></textarea>
+      </div>
+    </div>
+    <div class="sec" id="sd" style="display:none"><div class="slbl">Responsabilidade</div>
+      <div class="disc-box">
+        <label>
+          <input type="checkbox" id="dcb" onchange="upd()"/>
+          <span>Confirmo que todas as informacoes preenchidas sao verdadeiras e de minha responsabilidade. Comprometo-me a executar minhas atividades sempre com seguranca.</span>
+        </label>
+      </div>
+    </div>
+    <div class="sec" id="sb" style="display:none;padding-bottom:0">
+      <button class="bsub" id="bsub" disabled onclick="doSubmit()">Enviar checklist</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <!-- HISTORICO -->
+  <div id="vh" style="display:none;padding:1rem">
+    <button class="bexp" onclick="doExport()">Exportar registros (.csv)</button>
+    <div id="rlist"></div>
+  </div>
+
+  <!-- CONFIGURAR -->
+  <div id="vc" style="display:none;padding:1rem">
+    <div class="cfg-card">
+      <div class="cfg-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Integracao SharePoint
+      </div>
+      <div class="slbl" style="margin-bottom:5px">Token de acesso (Microsoft Graph)</div>
+      <input type="text" id="cfg-token" placeholder="Cole aqui o Bearer token do Microsoft Graph..." oninput="saveConfig()"/>
+      <div class="cfg-hint">
+        O token e necessario para enviar os dados diretamente a planilha <strong>Cheklist Veicular.xlsx</strong> no SharePoint.<br><br>
+        Como obter: acesse <strong>developer.microsoft.com/graph/graph-explorer</strong>, faca login com sua conta Serena e copie o token de acesso.
+      </div>
+    </div>
+    <div class="cfg-card" style="background:#f9f9f9;border-color:#e0e0e0">
+      <div class="cfg-title" style="color:var(--text-muted)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Comportamento sem token / offline
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6">
+        Sem token ou sem conexao, o checklist e salvo <strong>localmente</strong> no dispositivo. Quando o token for configurado e a conexao voltar, os registros pendentes sao enviados automaticamente ao SharePoint.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DRIVE_ID   = 'b!ED5_Xo9QsEiuF5lPMg7tDE7i1z8TwWNFmGCwiZtVp4hIznAai7QfSLCBh4yrWDNp';
+const ITEM_ID    = '01CSNYN7H2MW3YLBWD5NEYWCIABMHJQ746';
+const TABLE_NAME = 'checklist_serena';
+
+const ITEMS = [
+  {n:'Freios',i:false},{n:'Freio de estacionamento',i:false},{n:'Motor de partida',i:false},
+  {n:'Limpador de para-brisa',i:false},{n:'Lavador de para-brisa',i:false},{n:'Buzina',i:false},
+  {n:'Faróis',i:true},{n:'Lanternas dianteiras (seta)',i:true},{n:'Lanternas traseiras (seta)',i:true},
+  {n:'Luz de freio',i:true},{n:'Luz de re',i:false},{n:'Triangulo de advertencia',i:true},
+  {n:'Espelhos retrovisores',i:false},{n:'Indicadores de painel',i:false},
+  {n:'Pneus',i:true},{n:'Pneu estepe',i:true},{n:'Vidros',i:false},{n:'Portas',i:false},
+  {n:'Cinto de segurança',i:true},{n:'Macaco',i:false},{n:'Chave de roda',i:false},
+  {n:'Nivel de oleo',i:false},{n:'Nivel fluido de freio',i:false},{n:'Nivel de agua',i:false}
+];
+
+let st = {};
+let recs = JSON.parse(localStorage.getItem('serena_cl') || '[]');
+let swReg = null;
+
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+function loadConfig() { document.getElementById('cfg-token').value = localStorage.getItem('serena_token') || ''; }
+function saveConfig() { localStorage.setItem('serena_token', document.getElementById('cfg-token').value.trim()); }
+function getToken()   { return localStorage.getItem('serena_token') || ''; }
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type, duration) {
+  duration = duration || 3500;
+  var t = document.getElementById('toast');
+  t.className = 'toast ' + type;
+  t.innerHTML = type === 'loading' ? '<div class="spinner"></div><span>' + msg + '</span>' : msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  if (type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, duration);
+}
+function hideToast() { document.getElementById('toast').classList.remove('show'); }
+
+// ─── ITEMS ────────────────────────────────────────────────────────────────────
+function initItems() {
+  var el = document.getElementById('ilist');
+  el.innerHTML = ''; st = {};
+  ITEMS.forEach(function(it, i) {
+    st[i] = {s: null, o: ''};
+    var d = document.createElement('div');
+    d.className = 'ci';
+    d.innerHTML = '<div class="irow"><span class="iname">' + it.n + '</span>' +
+      (it.i ? '<span class="bimp">Impeditivo</span>' : '') + '</div>' +
+      '<div class="rg">' +
+      '<div class="rb c" id="r' + i + 'c" onclick="setSt(' + i + ',\'c\')">Conforme</div>' +
+      '<div class="rb n" id="r' + i + 'n" onclick="setSt(' + i + ',\'n\')">Nao conforme</div>' +
+      '<div class="rb a" id="r' + i + 'a" onclick="setSt(' + i + ',\'a\')">N/A</div>' +
+      '</div>' +
+      '<textarea class="tobs" id="o' + i + '" placeholder="Descreva a nao conformidade..." style="display:none" oninput="st[' + i + '].o=this.value"></textarea>' +
+      (it.i ? '<div class="aimp" id="al' + i + '">Item impeditivo: o veiculo nao deve ser utilizado ate a regularizacao.</div>' : '');
+    el.appendChild(d);
+  });
+}
+
+function setSt(i, s) {
+  st[i].s = s;
+  ['c','n','a'].forEach(function(x){ document.getElementById('r'+i+x).classList.remove('on'); });
+  document.getElementById('r'+i+s).classList.add('on');
+  var obs = document.getElementById('o'+i);
+  var al  = document.getElementById('al'+i);
+  if (s === 'n') { obs.style.display = 'block'; if (al) al.style.display = 'block'; }
+  else           { obs.style.display = 'none';  if (al) al.style.display = 'none'; st[i].o = ''; }
+  upd();
+}
+
+function onVei() {
+  var v = document.getElementById('sel').value;
+  ['si','so','sd','sb'].forEach(function(id){ document.getElementById(id).style.display = v ? '' : 'none'; });
+  if (v) { initItems(); var p = v.split('|'); document.getElementById('hsub').textContent = p[0] + ' - ' + p[1] + ' - vistoria semanal'; }
+  else document.getElementById('hsub').textContent = 'Checklist veicular - vistoria semanal';
+  upd();
+}
+
+function upd() {
+  var vOk = !!document.getElementById('sel').value;
+  var cOk = document.getElementById('cond').value.trim().length > 0;
+  var dOk = document.getElementById('dcb').checked;
+  var filled = Object.values(st).filter(function(x){ return x.s !== null; }).length;
+  var pct = vOk ? Math.round((filled / ITEMS.length) * 100) : 0;
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('bsub').disabled = !(vOk && cOk && filled === ITEMS.length && dOk);
+}
+
+function label(s) { return s==='c'?'Conforme':s==='n'?'Nao Conforme':'N/A'; }
+
+// ─── SHAREPOINT ───────────────────────────────────────────────────────────────
+async function sendToSharePoint(row) {
+  var token = getToken();
+  if (!token) return false;
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + DRIVE_ID + '/items/' + ITEM_ID + '/workbook/tables/' + TABLE_NAME + '/rows/add';
+  var resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [row] })
+  });
+  if (!resp.ok) { var err = await resp.json().catch(function(){ return {}; }); throw new Error((err.error && err.error.message) || ('HTTP ' + resp.status)); }
+  return true;
+}
+
+// ─── INDEXEDDB + BACKGROUND SYNC ─────────────────────────────────────────────
+function openDB() {
+  return new Promise(function(resolve, reject) {
+    var req = indexedDB.open('serena_sync', 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('pending')) db.createObjectStore('pending', { keyPath: 'id' });
+    };
+    req.onsuccess = function(e) { resolve(e.target.result); };
+    req.onerror   = function()  { reject(req.error); };
+  });
+}
+
+async function savePendingSync(id, row) {
+  var token = getToken();
+  if (!token) return;
+  var db = await openDB();
+  var tx = db.transaction('pending', 'readwrite');
+  tx.objectStore('pending').put({
+    id: id,
+    url: 'https://graph.microsoft.com/v1.0/drives/' + DRIVE_ID + '/items/' + ITEM_ID + '/workbook/tables/' + TABLE_NAME + '/rows/add',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [row] })
+  });
+  await new Promise(function(res, rej){ tx.oncomplete = res; tx.onerror = rej; });
+  if (swReg && 'sync' in swReg) await swReg.sync.register('sync-checklists');
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────────────────
+async function doSubmit() {
+  var p    = document.getElementById('sel').value.split('|');
+  var cond = document.getElementById('cond').value.trim();
+  var impNc = ITEMS.some(function(it, i){ return it.i && st[i].s === 'n'; });
+  if (impNc && !confirm('Um ou mais itens IMPEDITIVOS estao como Nao Conforme. O veiculo nao deve ser utilizado. Deseja registrar mesmo assim?')) return;
+
+  var items = ITEMS.map(function(it, i){ return {n: it.n, i: it.i, s: st[i].s, o: st[i].o}; });
+  var obsG  = document.getElementById('og').value;
+  var dt    = new Date().toLocaleString('pt-BR');
+  var rec   = {id: Date.now(), dt: dt, vei: p[0], placa: p[1], resp: p[2], cond: cond, items: items, obsG: obsG, synced: false};
+
+  var row = [dt, p[0], p[1], p[2], cond]
+    .concat(items.map(function(it){ return label(it.s); }))
+    .concat(items.map(function(it){ return it.o || ''; }))
+    .concat([obsG || '']);
+
+  document.getElementById('bsub').disabled = true;
+
+  var token = getToken();
+  if (token) {
+    if (navigator.onLine) {
+      showToast('Enviando para o SharePoint...', 'loading');
+      try {
+        await sendToSharePoint(row);
+        rec.synced = true;
+        showToast('Checklist salvo no SharePoint!', 'ok');
+      } catch(e) {
+        await savePendingSync(rec.id, row).catch(function(){});
+        showToast('Erro - sincronizara quando disponivel', 'err', 4000);
+      }
+    } else {
+      await savePendingSync(rec.id, row).catch(function(){});
+      showToast('Offline - enviara ao SharePoint quando conectar', 'loading', 4000);
+    }
+  } else {
+    showToast('Configure o token na aba Configurar', 'err', 4000);
+  }
+
+  recs.unshift(rec);
+  localStorage.setItem('serena_cl', JSON.stringify(recs));
+
+  document.getElementById('sel').value  = '';
+  document.getElementById('cond').value = '';
+  document.getElementById('dcb').checked = false;
+  document.getElementById('og').value   = '';
+  ['si','so','sd','sb'].forEach(function(id){ document.getElementById(id).style.display = 'none'; });
+  document.getElementById('hsub').textContent = 'Checklist veicular - vistoria semanal';
+  document.getElementById('prog').style.width = '0%';
+  st = {};
+  document.getElementById('bsub').disabled = false;
+}
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────────
+function goView(v) {
+  document.getElementById('vf').style.display = v === 'f' ? '' : 'none';
+  document.getElementById('vh').style.display = v === 'h' ? '' : 'none';
+  document.getElementById('vc').style.display = v === 'c' ? '' : 'none';
+  ['f','h','c'].forEach(function(x){ document.getElementById('nb-'+x).classList.toggle('on', v === x); });
+  if (v === 'h') renderRecs();
+  if (v === 'c') loadConfig();
+}
+
+// ─── HISTORICO ────────────────────────────────────────────────────────────────
+function renderRecs() {
+  var el = document.getElementById('rlist');
+  if (!recs.length) { el.innerHTML = '<div class="empty">Nenhum registro ainda.</div>'; return; }
+  el.innerHTML = recs.map(function(r) {
+    var c   = r.items.filter(function(x){ return x.s === 'c'; }).length;
+    var n   = r.items.filter(function(x){ return x.s === 'n'; }).length;
+    var a   = r.items.filter(function(x){ return x.s === 'a'; }).length;
+    var imp = r.items.filter(function(x){ return x.i && x.s === 'n'; }).length;
+    var ncs = r.items.filter(function(x){ return x.s === 'n'; }).map(function(x){ return x.n + (x.o ? ': ' + x.o : ''); }).join('; ');
+    var badge = r.synced
+      ? '<span class="sync-badge sync-ok"><span class="sync-dot"></span>SharePoint</span>'
+      : '<span class="sync-badge sync-local"><span class="sync-dot"></span>Local</span>';
+    return '<div class="rc">' +
+      '<div class="rh"><div class="rv">' + r.vei + ' - ' + r.placa + '</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="rd">' + r.dt + '</div>' + badge + '</div></div>' +
+      '<div class="rw">' + r.cond + ' - responsavel: ' + r.resp + '</div>' +
+      '<div class="pills"><span class="pl plc">' + c + ' conformes</span>' +
+      (n ? '<span class="pl pln">' + n + ' nao conforme' + (n>1?'s':'') + '</span>' : '') +
+      (a ? '<span class="pl pla">' + a + ' N/A</span>' : '') +
+      (imp ? '<span class="pl pli">' + imp + ' impeditivo' + (imp>1?'s':'') + ' NC</span>' : '') +
+      '</div>' +
+      ((ncs || r.obsG) ? '<div class="robs">' + (ncs ? '<strong>NC:</strong> '+ncs : '') + (ncs && r.obsG ? ' - ' : '') + (r.obsG ? '<strong>Obs:</strong> '+r.obsG : '') + '</div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+// ─── EXPORT CSV ───────────────────────────────────────────────────────────────
+function doExport() {
+  if (!recs.length) { alert('Nenhum registro para exportar.'); return; }
+  var hdr = ['Data','Veiculo','Placa','Responsavel','Condutor','Sincronizado SharePoint']
+    .concat(ITEMS.map(function(it){ return it.n; }))
+    .concat(ITEMS.map(function(it){ return it.n + ' - Obs.'; }))
+    .concat(['Obs. Gerais']);
+  var rows = [hdr];
+  recs.forEach(function(r) {
+    rows.push([r.dt, r.vei, r.placa, r.resp, r.cond, r.synced ? 'Sim' : 'Nao']
+      .concat(r.items.map(function(it){ return label(it.s); }))
+      .concat(r.items.map(function(it){ return it.o || ''; }))
+      .concat([r.obsG || '']));
+  });
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"' + String(c).replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'}));
+  a.download = 'checklist_serena.csv';
+  a.click();
+}
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async function() {
+    try {
+      swReg = await navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'SYNC_OK') {
+          var idx = recs.findIndex(function(r){ return r.id == e.data.id; });
+          if (idx !== -1) { recs[idx].synced = true; localStorage.setItem('serena_cl', JSON.stringify(recs)); }
+          showToast('Checklist sincronizado com o SharePoint!', 'ok');
+        }
+      });
+    } catch(e) { console.warn('SW registration failed:', e); }
+  });
+}
+</script>
+</body>
+</html>
