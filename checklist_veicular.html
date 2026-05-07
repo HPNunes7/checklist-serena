@@ -90,6 +90,19 @@
   .cfg-card input[type=text]{background:var(--white);font-size:13px;padding:9px 12px}
   .cfg-hint{font-size:11px;color:#4a6fa5;margin-top:5px;line-height:1.5}
   .spacer{height:1.5rem}
+  .token-banner{background:#cc3b30;color:#fff;padding:10px 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:500;line-height:1.4;}
+  .token-banner a{color:#fff;font-weight:700;text-decoration:underline;white-space:nowrap;cursor:pointer;}
+  .token-ok{display:none;align-items:center;gap:8px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:10px 13px;margin-top:10px;font-size:13px;color:var(--green-text);font-weight:500;}
+  .token-ok .tok-icon{font-size:16px;flex-shrink:0;}
+  .token-banner{
+    background:#cc3b30;color:#fff;
+    padding:10px 1.25rem;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    font-size:13px;font-weight:500;line-height:1.4;
+  }
+  .token-banner a{color:#fff;font-weight:700;text-decoration:underline;white-space:nowrap;cursor:pointer;}
+  .token-ok{display:none;align-items:center;gap:8px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:10px 13px;margin-top:10px;font-size:13px;color:var(--green-text);font-weight:500;}
+  .token-ok .tok-icon{font-size:16px;flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg)}}
   .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
 </style>
@@ -119,6 +132,12 @@
     <button class="nb on" id="nb-f" onclick="goView('f')">Novo checklist</button>
     <button class="nb" id="nb-h" onclick="goView('h')">Historico</button>
     <button class="nb" id="nb-c" onclick="goView('c')">Configurar</button>
+  </div>
+
+  <!-- BANNER TOKEN -->
+  <div id="token-banner" class="token-banner" style="display:none">
+    <span>⚠️ Token não configurado — os dados não serão enviados ao SharePoint.</span>
+    <a onclick="goView('c')">Configurar</a>
   </div>
 
   <!-- FORM -->
@@ -182,6 +201,10 @@
         O token e necessario para enviar os dados diretamente a planilha <strong>Cheklist Veicular.xlsx</strong> no SharePoint.<br><br>
         Clique no botao abaixo, faca login com sua conta Serena e copie o token na aba <strong>Access token</strong>.
       </div>
+      <div class="token-ok" id="token-ok">
+        <span class="tok-icon">✓</span>
+        <span>Token configurado! Os checklists serao enviados automaticamente ao SharePoint.</span>
+      </div>
       <a href="https://developer.microsoft.com/graph/graph-explorer" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:11px;background:#185abd;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Abrir Graph Explorer
@@ -222,8 +245,17 @@ let recs = JSON.parse(localStorage.getItem('serena_cl') || '[]');
 let swReg = null;
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-function loadConfig() { document.getElementById('cfg-token').value = localStorage.getItem('serena_token') || ''; }
-function saveConfig() { localStorage.setItem('serena_token', document.getElementById('cfg-token').value.trim()); }
+function loadConfig() {
+  var token = localStorage.getItem('serena_token') || '';
+  document.getElementById('cfg-token').value = token;
+  document.getElementById('token-ok').style.display = token ? 'flex' : 'none';
+}
+function saveConfig() {
+  var token = document.getElementById('cfg-token').value.trim();
+  localStorage.setItem('serena_token', token);
+  document.getElementById('token-ok').style.display = token ? 'flex' : 'none';
+  upd();
+}
 function getToken()   { return localStorage.getItem('serena_token') || ''; }
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
@@ -286,7 +318,9 @@ function upd() {
   var filled = Object.values(st).filter(function(x){ return x.s !== null; }).length;
   var pct = vOk ? Math.round((filled / ITEMS.length) * 100) : 0;
   document.getElementById('prog').style.width = pct + '%';
-  document.getElementById('bsub').disabled = !(vOk && cOk && filled === ITEMS.length && dOk);
+  var hasToken = !!getToken();
+  document.getElementById('token-banner').style.display = hasToken ? 'none' : 'flex';
+  document.getElementById('bsub').disabled = !(vOk && cOk && filled === ITEMS.length && dOk && hasToken);
 }
 
 function label(s) { return s==='c'?'Conforme':s==='n'?'Nao Conforme':'N/A'; }
@@ -444,6 +478,9 @@ function doExport() {
 }
 
 // ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+// Mostra banner ao carregar
+window.addEventListener('load', function(){ upd(); });
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async function() {
     try {
